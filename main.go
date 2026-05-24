@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"time"
+	"sync"
 )
 
 func main() {
@@ -13,16 +14,24 @@ func main() {
 	start := flag.Int("start", 1, "Target Port")
 	end := flag.Int("end", 1024, "Target Port")
 	flag.Parse()
+	var wg sync.WaitGroup
+	ch := make(chan int, 65535)
 
 	for i := *start; i <= *end; i++ {
-		address := fmt.Sprintf("%s:%d", *ip, i)
+		wg.Add(1)
+		go func(port int){
+		defer wg.Done()
+		address := fmt.Sprintf("%s:%d", *ip, port)
 		conn, err := net.DialTimeout("tcp", address, 1*time.Second)
 		if err == nil {
-			fmt.Printf("Port: %d is open.\n", i)
 			conn.Close()
-		} else {
-			fmt.Printf("Port: %d is closed.\n", i)
+			ch <- port
 		}
-	}
-
+	}(i)
+}
+	wg.Wait()
+	close(ch)
+	for port := range ch {
+		fmt.Printf("Port %d is open.\n", port)
+		}
 }
