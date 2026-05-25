@@ -5,10 +5,11 @@ concurrently. For sysadmins, pentesters, and security researchers
 who need fast network reconnaissance.
 
 ## Flags:
+```
   -ip     Target IP address (default: 127.0.0.1)
   -start  Starting port (default: 1)
   -end    Ending port (default: 1024)
-
+```
 ## Example:
   ```go run main.go -ip 192.168.1.1 -start 1 -end 1024```
 
